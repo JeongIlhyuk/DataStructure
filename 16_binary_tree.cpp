@@ -90,7 +90,7 @@ TreeNode* insertBST(TreeNode* root, int data) {
 	if (data < root->data) {
 		root->left = insertBST(root->left, data);
 	}
-	else if (data > root->data) {
+	else if (data > root->data) {//else로 해도 됨
 		root->right = insertBST(root->right, data);
 	}
 	return root;

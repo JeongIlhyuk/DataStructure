@@ -111,12 +111,12 @@ TreeNode* insertAVL(TreeNode* root, int data) {
 
     if (balance > 1 && data < root->left->data)  // LL
         return rotateLL(root);
-    if (balance < -1 && data > root->right->data) // RR
-        return rotateRR(root);
     if (balance > 1 && data > root->left->data) { // LR
         root->left = rotateRR(root->left);
         return rotateLL(root);
     }
+    if (balance < -1 && data > root->right->data) // RR
+        return rotateRR(root);
     if (balance < -1 && data < root->right->data) { // RL
         root->right = rotateLL(root->right);
         return rotateRR(root);
