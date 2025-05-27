@@ -4,11 +4,6 @@
 
 using namespace std;
 
-#define MAX_SIZE 20
-
-int BT_Array[MAX_SIZE];
-int BT_Array_Size = 0;
-
 typedef struct TreeNode {
     int data;
     TreeNode *left = NULL;
