@@ -5,16 +5,16 @@
 
 int ternary_search_peak(int arr[], int size) {
     int left = 0, right = size - 1;
-    while (right - left > 2) {
-        int mid1 = left + (right - left) / 3;
-        int mid2 = right - (right - left) / 3;
-        if (arr[mid1] < arr[mid2]) left = mid1 + 1;
+    while(right - left > 2){
+        const int mid1 = left + (right - left) / 3;
+        const int mid2 = right - (right - left) / 3;
+        if(arr[mid1] < arr[mid2]) left = mid1 + 1;
         else right = mid2 - 1;
     }
 
     int max_idx = left;
-    for (int i = left + 1; i <= right; i++) {
-        if (arr[i] > arr[max_idx]) max_idx = i;
+    for(int i = left + 1; i <= right; i++){
+        max_idx = arr[i] > arr[max_idx] ? i : max_idx;
     }
     return max_idx;
 }
