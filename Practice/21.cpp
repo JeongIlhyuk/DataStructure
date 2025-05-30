@@ -38,7 +38,7 @@ void chain_insert(const char* key, int value) {
     const auto index = h % current_capa;
 
     printf("Trying to insert %s at index %lu (hash: %lu)\n", key, index, h);
-    Node* new_node = (Node*)malloc(sizeof(Node));   // ✅ 구조체 전체 크기 할당
+    auto new_node = (Node*)malloc(sizeof(Node));   // ✅ 구조체 전체 크기 할당
     if(!new_node){
         perror("malloc");
         return;
