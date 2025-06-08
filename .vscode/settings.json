@@ -3,6 +3,7 @@
         "iostream": "cpp",
         "__node_handle": "cpp",
         "__locale": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "ios": "cpp"
     }
 }
