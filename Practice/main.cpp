@@ -1,118 +1,57 @@
 #include <iostream>
-#include <algorithm>
-#include <utility>
-#include <queue>
+#include <vector>
 
 using namespace std;
 
-const int MAX_EDGE = 500 * 499 / 2;
-const int MAX_WEIGHT = MAX_EDGE * 1000;
+vector<int> graph;
+vector<int> vist;
+vector<bool> isCycle;
 
-auto djikstra(const int adj[][500], int path[][MAX_EDGE + 2], const int n, const int start){
-    vector<int> dist(500, MAX_WEIGHT);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+void dfs(const int curr){
+    const auto next = graph[curr];
+    vist[curr] = 1;
 
-    dist[start] = 0;
-    pq.push({0, start});
+    if(vist[next] == 0){
+        dfs(next);
+    }else if(vist[next] == 1){
+        auto c = next;
 
-    while(!pq.empty()){
-        const auto weight = pq.top().first;
-        const auto node = pq.top().second;
-
-        pq.pop();
-
-        if(weight > dist[node]) continue;
-
-        for(int next = 1; next <= n; next++){
-            const auto w = adj[node][next];
-            if(w != -1 && dist[node] + w < dist[next]) {
-                int i = 0;
-                while(path[node][i] != -1){
-                    path[next][i] = path[node][i];
-                    i++;
-                }
-                path[next][i] = next;
-
-                dist[next] = dist[node] + w;
-                pq.push({dist[next], next});
-            }
+        isCycle[curr] = true;
+        while(c != curr){
+            isCycle[c] = true;
+            c = graph[c];
         }
     }
-
-    return dist;
+    vist[curr] = 2;
 }
-
-auto almost_djik(const int adj[][500], int path[][MAX_EDGE + 2], const int n, const int start){
-    vector<int> dist(500, MAX_WEIGHT);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-
-    dist[start] = 0;
-    pq.push({0, start});
-
-    while(!pq.empty()){
-        const auto weight = pq.top().first;
-        const auto node = pq.top().second;
-
-        pq.pop();
-
-        if(weight > dist[node]) continue;
-
-        for(int next = 1; next <= n; next++){
-            const auto w = adj[node][next];
-            if(w != -1 && dist[node] + w < dist[next]) {
-                int i = 0;
-                while(path[node][i] != -1){
-                    path[next][i] = path[node][i];
-                    i++;
-                }
-                path[next][i] = next;
-
-                dist[next] = dist[node] + w;
-                pq.push({dist[next], next});
-            }
-        }
-    }
-
-    return dist;
-}
-
-
 
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
 
+    int t;
 
-    int n, m;
-    while(cin >> n >> m && (n != 0 || m != 0)){
-        int adj[500][500];
-        int path[500][MAX_EDGE + 2];
-        int excluded[500] = {};
-        int s, d;
+    cin >> t;
 
-        cin >> s >> d;
-        
-        for(int i = 0; i < 500; i++)
-            fill(adj[i], adj[i] + 500, -1);
-        for(int i = 0; i < 500; i++){
-            path[i][0] = s;
-            fill(path[i] + 1, path[i] + MAX_EDGE + 2, -1);
-        }
-        
-        while(m--){
-            int curr, next, weight;
-            
-            cin >> curr >> next >> weight;
-            adj[curr][next] = weight;
-        }
-        
-        djikstra(adj, path, n, s);
+    while(t--){
+        int n, result = 0;
 
+        cin >> n;
 
-        int i = 0;
-        while(path[d][i] != -1){
-            excluded[path[d][i]] = 1;
-        }
+        graph.resize(n + 1);
+        vist.assign(n + 1, 0);
+        isCycle.assign(n + 1, false);
+
+        for(int i = 1; i <= n; i++)
+            cin >> graph[i];
+
+        for(int i = 1; i <= n; i++)
+            if(vist[i] == 0) dfs(i);
+
+        for(int i = 1; i <= n; i++)
+            if(!isCycle[i])result++;
+
+        cout << result << '\n';
     }
 
     return 0;

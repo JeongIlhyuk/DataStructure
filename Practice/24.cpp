@@ -7,14 +7,14 @@ typedef struct Node {
     Node* next = nullptr;
 } Node;
 
-Node* head = NULL;
-Node* tail = NULL;
+Node* head = nullptr;
+Node* tail = nullptr;
 
 Node* create_node(int data) {
     const auto new_node = (Node*)malloc(sizeof(Node));
     if(!new_node){
         perror("malloc");
-        return new_node;
+        return nullptr;
     }
     new_node->data = data;
     return new_node;
@@ -78,7 +78,7 @@ int main() {
 
     clock_t start, end;
     double time_taken = 0;
-    Node* result = NULL;
+    Node* result = nullptr;
 
     // Repeat multiple times to improve measurement resolution
     int trials = 10;

@@ -30,27 +30,31 @@ typedef struct {
 
 Node* bucket = NULL;
 
-void init_linear_table(int size) {
+void init_linear_table(const int size) {
     current_size = size;
     bucket = (Node*)calloc(current_size, sizeof(Node));
 }
 
-void linear_insert(const char* key, int value) {
+void linear_insert(const char* key, const int value) {
     const auto h = hash(key);
     const auto index = h % current_size;
+    
     printf("Trying to insert %s at index %lu (hash: %lu)\n", key, index, h);
+    
     for(int i = 0; i < current_size; i++){
         const auto try_idx = (index + i) % current_size;
-        if(bucket[try_idx].state != FILLED){
-            bucket[try_idx].key = (char*)malloc(strlen(key) + 1);
-            if(!bucket[try_idx].key){
+        auto& b = bucket[try_idx];
+
+        if(b.state != FILLED){
+            b.key = (char *)malloc(strlen(key) + 1);
+            if(!b.key){
                 perror("malloc");
                 return;
             }
-            strcpy(bucket[try_idx].key, key);
-            bucket[try_idx].value = value;
-            bucket[try_idx].hash = h;
-            bucket[try_idx].state = FILLED;
+            strcpy(b.key, key);
+            b.value = value;
+            b.hash = h;
+            b.state = FILLED;
             return;
         }
     }
@@ -58,22 +62,31 @@ void linear_insert(const char* key, int value) {
 }
 
 int linear_get(const char* key) {
-    const auto index = hash(key) % current_size;
+    const auto idx = hash(key) % current_size;
+
     for(int i = 0; i < current_size; i++){
-        const auto try_idx = (index + i) % current_size;
-        if(bucket[try_idx].state == EMPTY) return -1;
-        if(bucket[try_idx].state == FILLED && strcmp(bucket[try_idx].key, key) == 0) return bucket[try_idx].value;
+        const auto try_idx = (idx + i) % current_size;
+        const auto& b = bucket[try_idx];
+
+        if(b.state == EMPTY) return -1;
+        if(b.state == DELETED) continue;
+        if(strcmp(b.key, key) == 0) return bucket[try_idx].value;
     }
 }
 
 void linear_remove(const char* key) {
-    const auto index = hash(key) % current_size;
+    const auto idx = hash(key) % current_size;
+
     for(int i = 0; i < current_size; i++){
-        const auto try_idx = (index + i) % current_size;
-        if(bucket[try_idx].state == EMPTY) return;
-        if(bucket[try_idx].state == FILLED && strcmp(bucket[try_idx].key, key) == 0) {
-            free(bucket[try_idx].key);
-            bucket[try_idx].state = DELETED;
+        const auto try_idx = (idx + i) % current_size;
+        auto& b = bucket[try_idx];
+
+        if(b.state == EMPTY) return;
+        if(b.state == DELETED) continue;
+        if(strcmp(b.key, key) == 0){
+            free(b.key);
+            b.state = DELETED;
+            
             return;
         }
     }
@@ -81,19 +94,28 @@ void linear_remove(const char* key) {
 
 void linear_rehash_table() {
     const auto new_size = current_size * 2;
-    const auto new_bucket = (Node*)calloc(new_size, sizeof(Node));
+    const auto& new_bucket = (Node *)calloc(new_size, sizeof(Node));
+
+    if(!new_bucket){
+        perror("calloc");
+        return;
+    }
+
     for(int i = 0; i < current_size; i++){
-        if(bucket[i].state == FILLED){
-            const auto index = bucket[i].hash % new_size;
-            for(int j = 0; j < new_size; j++){
-                const auto try_idx = (index + j) % new_size;
-                if(new_bucket[try_idx].state != FILLED){
-                    new_bucket[try_idx] = bucket[i];  // index → try_idx로 수정
-                    break;
-                }
+        if(bucket[i].state != FILLED) continue;
+
+        const auto new_idx = bucket[i].hash % new_size;
+
+        for(int j = 0; j < new_size; j++){
+            const auto try_idx = (new_idx + j) % new_size;
+
+            if(new_bucket[try_idx].state == EMPTY){
+                new_bucket[try_idx] = bucket[i];
+                break;
             }
         }
     }
+
     free(bucket);
     bucket = new_bucket;
     current_size = new_size;

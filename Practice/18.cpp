@@ -4,45 +4,45 @@
 using namespace std;
 
 #define MAX_SIZE 100
-#define ROOT 1
 
 int heap[MAX_SIZE];
 int heapSize = 0;
 
-int parent(int i) { return i / 2; }
-int left(int i) { return 2 * i; }
-int right(int i) { return 2 * i + 1; }
+int parent(const int i) { return i / 2; }
+int left(const int i) { return 2 * i; }
+int right(const int i) { return 2 * i + 1; }
 
-void insert(int value) {
-    heap[++heapSize] = value;
-    int i = heapSize;
+void insert(const int value) {
+    auto i = ++heapSize;
+    heap[i] = value;
     while(i > 1 && heap[i] > heap[parent(i)]){
-        swap(heap[i], heap[parent(i)]);
-        i = parent(i);
+        const auto parent_idx = parent(i);
+        swap(heap[i], heap[parent_idx]);
+        i = parent_idx;
     }
 }
 
-void heapify(int i) { // bubble down approach
-    int l = left(i);
-    int r = right(i);
-    int largest = i;
+void heapify(const int i) { // bubble down approach
+    const auto l = left(i);
+    const auto r = right(i);
+    auto largest = i;
 
-    if (l <= heapSize && heap[l] > heap[largest]) largest = l;
-    if (r <= heapSize && heap[r] > heap[largest]) largest = r;
+    if(l <= heapSize && heap[l] > heap[largest])largest = l;
+    if(r <= heapSize && heap[r] > heap[largest])largest = r;
 
-    if(largest == i) return;
+    if(i == largest) return;
 
     swap(heap[largest], heap[i]);
     heapify(largest);
 }
 
 int deleteMax() {
-    if(heapSize == 0) return - 1;
+    if(heapSize == 0) return -1;
+    // const auto ret = heap[1] = heap[heapSize--];
+    const auto ret = heap[1];
+    heap[1] = heap[heapSize--];
 
-    int ret = heap[ROOT];
-    heap[ROOT] = heap[heapSize--];
-
-    heapify(ROOT);
+    heapify(1);
 
     return ret;
 }
@@ -76,20 +76,14 @@ void printHeapByLevel() {
 
 void buildHeap() { // print intermediate results
     printf("Start building heap (heapify from bottom-up):\n");
-    for(int i = heapSize / 2; i >= 1; i--){
+
+    for(int i = heapSize / 2; i >=1; i--){
         printf("\nHeapify at index %d (value = %d):\n", i, heap[i]);
         heapify(i);
         printHeapByLevel();
     }
-    printf("\n Finished building heap.\n");
-}
 
-void printHeap() { // print in array form
-    printf("Heap: ");
-    for (int i = 1; i <= heapSize; i++) {
-        printf("%d ", heap[i]);
-    }
-    printf("\n");
+    printf("\n Finished building heap.\n");
 }
 
 int main() {

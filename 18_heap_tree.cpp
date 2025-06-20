@@ -101,13 +101,13 @@ void buildHeap() { // print intermediate results
     printf("\n Finished building heap.\n");
 }
 
-void printHeap() { // print in array form
-    printf("Heap: ");
-    for (int i = 1; i <= heapSize; i++) {
-        printf("%d ", heap[i]);
-    }
-    printf("\n");
-}
+// void printHeap() { // print in array form
+//     printf("Heap: ");
+//     for (int i = 1; i <= heapSize; i++) {
+//         printf("%d ", heap[i]);
+//     }
+//     printf("\n");
+// }
 
 int main() {
     insert(10);

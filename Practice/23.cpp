@@ -7,7 +7,7 @@
 
 int comparisons = 0;
 
-int linear_search(int arr[], int n, int key) {
+int linear_search(const int arr[], const int n, const int key) {
     comparisons = 0;
     for (int i = 0; i < n; i++) {
         comparisons++;
@@ -18,7 +18,7 @@ int linear_search(int arr[], int n, int key) {
     return -1;
 }
 
-int binary_search(int arr[], int left, int right, int key) {
+int binary_search(const int arr[], int left, int right, const int key) {
     comparisons = 0;
     while (left <= right) {
         comparisons++;
@@ -36,53 +36,69 @@ int binary_search(int arr[], int left, int right, int key) {
     return -1;
 }
 
-int jump_search(int arr[], int n, int key) {
+int jump_search(const int arr[], const int n, const int key) {
     comparisons = 0;
     int step = sqrt(n);
     int prev = 0;
-    while(arr[(step < n ? step : n) - 1] < key){
+
+    while(arr[step < n ? step : n - 1] < key){
         comparisons++;
-        if(step >= n) return -1;
+        if(step > n - 1){
+            return -1;
+        }
         prev = step;
         step += sqrt(n);
     }
-    while(prev < step && prev < n && arr[prev] <= key){
+
+    while (arr[prev] < key) {
         comparisons++;
-        if(arr[prev] == key) return prev;
         prev++;
+        if (prev == step || prev >= n) {
+            return -1;
+        }
     }
-    return -1;
+    comparisons++;
+    return (arr[prev] == key) ? prev : -1;
 }
 
-int interpolation_search(int arr[], int n, int key) {
+int interpolation_search(const int arr[], const int n, const int key) {
     comparisons = 0;
-    int low = 0;
-    int high = n - 1;
+    
+    int low = 0, high = n - 1;
 
-    while(high >= low && key >= arr[low] && key <= arr[high]){
+    while(low <= high && key >= arr[low] && key <= arr[high]){
         comparisons++;
-        const int pos = low + (double)(high - low) / (arr[high] - arr[low]) * (key - arr[low]);   
+
+        const int pos = low + (double)(high - low) / (arr[high] - arr[low]) * (key - arr[low]);
+
         if(arr[pos] == key) return pos;
         if(arr[pos] > key) high = pos - 1;
         else low = pos + 1;
     }
+
     return -1;
 }
 
-int exponential_search(int arr[], int n, int key) {
+int exponential_search(const int arr[], const int n, const int key) {
     comparisons = 0;
+    
     if(arr[0] == key){
         comparisons++;
         return 0;
     }
+
     int i = 1;
     while(i < n && arr[i] <= key){
         comparisons++;
         i *= 2;
     }
 
-    const auto result = binary_search(arr, i / 2, i < n? i : n - 1, key);
-    comparisons += comparisons;
+    const auto right = i > n - 1 ? n - 1 : i;
+    const auto left = i / 2;
+    
+    // return binary_search(arr, low, high, key);
+    int result = binary_search(arr, left, right, key);
+    comparisons *= 2;
     return result;
 }
 

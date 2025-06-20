@@ -8,60 +8,63 @@
 // Trie node structure
 typedef struct TrieNode {
     TrieNode* children[ALPHABET_SIZE];
-    bool isEndOfWord = false;
+    int isEndOfWord = 0;
 } TrieNode;
 
 TrieNode* createNode() {
-    auto node = (TrieNode*)malloc(sizeof(TrieNode));
-    for(int i = 0; i < ALPHABET_SIZE; i++)
-        node->children[i] = NULL;
+    const auto node = (TrieNode *)malloc(sizeof(TrieNode));
+    if(!node){
+        perror("malloc");
+        return nullptr;
+    }
+    for(auto& child:node->children)
+        child = nullptr;
+
     return node;
 }
 
 void insert(TrieNode* root, const char* word) {
     auto curr = root;
     for(int i = 0; word[i] != '\0'; i++){
-        int idx = word[i] - 'a';
+        const auto idx = word[i] - 'a';
         if(!curr->children[idx]) curr->children[idx] = createNode();
         curr = curr->children[idx];
     }
-    curr->isEndOfWord = true;
+    curr->isEndOfWord = 1;
 }
 
-bool search(TrieNode* root, const char* word) {
+int search(TrieNode* root, const char* word) {
     auto curr = root;
     for(int i = 0; word[i] != '\0'; i++){
-        int idx = word[i] - 'a';
-        if(!curr->children[idx]) return false;
+        const auto idx = word[i] - 'a';
+        if(!curr->children[idx]) return 0;
         curr = curr->children[idx];
     }
     return curr->isEndOfWord;
 }
 
-bool isEmpty(TrieNode* root) {
-    for(int i = 0; i < ALPHABET_SIZE; i++)
-        if(root->children[i]) return false;
-    return true;
+int isEmpty(const TrieNode* root) {
+    for(const auto child:root->children)
+        if(child) return 0;
+    return 1;
 }
 
 TrieNode* deleteWord(TrieNode* root, const char* word, int depth = 0) {
-    if(!root) return NULL;
-
+    if(!root) return nullptr;
     if(word[depth] == '\0'){
+        root->isEndOfWord = 0;
         if(isEmpty(root)){
             free(root);
-            return NULL;
+            return nullptr;
         }
-        root->isEndOfWord = false;
         return root;
     }
 
-    int idx = word[depth] - 'a';
+    const int idx = word[depth] - 'a';
     root->children[idx] = deleteWord(root->children[idx], word, depth + 1);
-
     if(isEmpty(root) && !root->isEndOfWord){
         free(root);
-        return NULL;
+        return nullptr;
     }
     return root;
 }
